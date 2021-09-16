@@ -64,7 +64,31 @@ class Blockchain {
     _addBlock(block) {
         let self = this;
         return new Promise(async (resolve, reject) => {
-           
+
+            // Increase the height of the block
+            const newBlockHeight = this.height + 1
+
+            // Set the 'block.height' to the updated one
+            block.height = newBlockHeight
+
+            // Assign the timestamp to the block
+            block.time = new Date().getTime().toString().slice(0, -3);
+
+            if(newBlockHeight > 0) {
+                const previousBlock = await this.getBlockByHeight(this.height);
+                block.previousBlockHash = previousBlock.hash;
+            }
+
+            // Create the `block hash`
+            block.hash = SHA256( JSON.stringify(block) ).toString();
+
+            // Push the block into the chain array
+            this.chain.push(block);
+
+            // Update the `this.height` to the calculated height
+            this.height = newBlockHeight;
+
+            resolve(block);
         });
     }
 
