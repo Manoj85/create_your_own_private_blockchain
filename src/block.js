@@ -38,17 +38,22 @@ class Block {
     validate() {
         let self = this;
         return new Promise((resolve, reject) => {
+          try {
             // Save in auxiliary variable the current block hash
-            const current_blockchain_hash = this.hash;
+            const current_blockchain_hash = self.hash;
 
             // Recalculate the hash of the Block
-            const recalculate_hash = SHA256( JSON.stringify(this) ).toString();
+            const recalculate_hash = SHA256( JSON.stringify(self) );
 
             // Comparing if the hashes changed
             // Returning the Block is not valid
-            
+
             // Returning the Block is valid
             resolve(current_blockchain_hash === recalculate_hash)
+          } catch (err) {
+            reject(new Error(err))
+          }
+
         });
     }
 
@@ -69,9 +74,18 @@ class Block {
         // Resolve with the data if the object isn't the Genesis block
       return new Promise((resolve, reject) => {
         if (!this.previousBlockHash) resolve(null);
+        try {
+          const decodedData = hex2ascii(self.body);
+          const parsedData = JSON.parse( decodedData );
 
-        const parsedData = JSON.parse( hex2ascii(this.body) );
-        resolve(parsedData);
+          if(self.height > 0) {
+            resolve(parsedData);
+          }
+
+        } catch (err) {
+          reject(new Error(err))
+        }
+
       });
     }
 
