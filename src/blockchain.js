@@ -220,7 +220,20 @@ class Blockchain {
     let self = this;
     let stars = [];
     return new Promise((resolve, reject) => {
+      self.chain.forEach( async (block) => {
+        console.log(block)
+        const blockData = await block.getBData();
+        console.log(`blockData: ${blockData}`)
+        if(blockData.owner === address) {
+          stars.push(blockData)
+        }
+      })
 
+      if(!!stars.length) {
+        reject(`No stars existed in the chain for the owner! `)
+      } else {
+        resolve(stars);
+      }
     });
   }
 
@@ -234,7 +247,9 @@ class Blockchain {
     let self = this;
     let errorLog = [];
     return new Promise(async (resolve, reject) => {
-
+      self.chain.forEach( async (block) => {
+        
+      });
     });
   }
 
