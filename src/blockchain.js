@@ -179,9 +179,17 @@ class Blockchain {
    * @param {*} hash
    */
   getBlockByHash(hash) {
+    console.log(`getBlockByHash`)
+    console.log(`hash: ${hash}`)
     let self = this;
     return new Promise((resolve, reject) => {
-
+      // Search on the chain array for the block that has the hash.
+      const searchedBlock = self.chain.find( blockToFind => hash === blockToFind.hash);
+      console.log(`searchedBlock: ${searchedBlock}`)
+      if(!searchedBlock) {
+        reject(new Error(`Could not find the block with hash: ${hash}!`));
+      }
+      resolve(searchedBlock);
     });
   }
 
