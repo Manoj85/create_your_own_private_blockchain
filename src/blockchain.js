@@ -247,9 +247,15 @@ class Blockchain {
     let self = this;
     let errorLog = [];
     return new Promise(async (resolve, reject) => {
-      self.chain.forEach( async (block) => {
-        
+      self.chain.forEach( block => {
+        const isBlockValid = block.validate();
+        console.log(`isBlockValid: ${isBlockValid}`);
+
+        if(!isBlockValid) {
+          errorLog.push(new Error(`The previous block's hash does not match the current block with height ${block.height}`))
+        }
       });
+      resolve(errorLog);
     });
   }
 
