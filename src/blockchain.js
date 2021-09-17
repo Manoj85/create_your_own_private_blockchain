@@ -44,7 +44,7 @@ class Blockchain {
    * Utility method that return a Promise that will resolve with the height of the chain
    */
   getChainHeight() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       resolve(this.height);
     });
   }
@@ -71,7 +71,7 @@ class Blockchain {
       block.time = new Date().getTime().toString().slice(0, -3);
 
       // Assign the "previousBlockHash" by checking the "height"
-      if (block.hash > 0) {
+      if (block.height > 0) {
         block.previousBlockHash = this.chain[block.height - 1].hash
       }
 
@@ -81,7 +81,7 @@ class Blockchain {
       // Validate the chain
       const errors = await self.validateChain();
 
-      if (block.hash && errors.length == 0) {
+      if (block.hash && errors.length === 0) {
         // Push the block into the chain array
         self.chain.push(block);
 
@@ -131,7 +131,6 @@ class Blockchain {
   submitStar(address, message, signature, star) {
     console.log(`submitStar`)
     console.log(`address: ${address} \n message: ${message} \n signature: ${signature} \n star: ${star}`);
-    let self = this;
     return new Promise(async (resolve, reject) => {
       const timeFromMessageSent = parseInt(message.split(':')[1])
       console.log(`timeFromMessageSent = ${timeFromMessageSent}`);
@@ -203,7 +202,7 @@ class Blockchain {
       if (block) {
         resolve(block);
       } else {
-        resolve(null);
+        reject(null);
       }
     });
   }
@@ -244,7 +243,7 @@ class Blockchain {
   validateChain() {
     let self = this;
     let errorLog = [];
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async (resolve) => {
       self.chain.forEach(block => {
         const isBlockValid = block.validate();
         console.log(`isBlockValid: ${isBlockValid}`);
