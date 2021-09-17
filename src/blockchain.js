@@ -131,9 +131,44 @@ class Blockchain {
    * @param {*} star
    */
   submitStar(address, message, signature, star) {
+    console.log(`submitStar`)
+    console.log(`address: ${address} \n message: ${message} \n signature: ${signature} \n star: ${star}`);
     let self = this;
     return new Promise(async (resolve, reject) => {
+      const timeFromMessageSent = parseInt(message.split(':')[1])
+      console.log(`timeFromMessageSent = ${timeFromMessageSent}`);
 
+      let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
+      console.log(`currentTime = ${currentTime}`);
+
+      // Check if the time elapsed is less than 5 minutes (compare the time in the message and currentTime)
+      const timeLapseAllowed = 5 * 60; // 5 minutes
+      console.log(`Allowed Time Lapse = ${timeLapseAllowed}`);
+      const timeElapsed = currentTime - timeFromMessageSent;
+      console.log(`timeElapsed = ${timeElapsed}`);
+
+      if (timeElapsed > timeLapseAllowed) {
+        reject(new Error('The time from which message sent is greater than 5 minutes!'));
+      }
+
+      // Verify the message with wallet address and signature:
+      const bitcoinMessageValid = bitcoinMessage.verify(message, address, signature);
+      if(!bitcoinMessageValid) {
+        reject(new Error('Validation Failure!! The message with wallet address and signature!'));
+      }
+
+      // Create the block and add it to the chain
+      // Resolve with the block added.
+      try {
+        const newBlock = new BlockClass.Block({star: star, owner: address});
+        console.log(`newBlock = ${newBlock}`);
+        const newBlockAddResponse = await this._addBlock(newBlock);
+        console.log(`newBlockAddResponse = ${newBlockAddResponse}`);
+        resolve(newBlockAddResponse)
+      } catch (err) {
+        console.log(`newBlock err = ${err}`);
+        reject(err)
+      }
     });
   }
 
