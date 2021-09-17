@@ -64,34 +64,22 @@ class Blockchain {
   _addBlock(block) {
     let self = this;
     return new Promise(async (resolve, reject) => {
+      // Set the 'block.height' to the length of the chain
+      block.height = this.chain.length
 
-      try {
-        // Increase the height of the block
-        const newBlockHeight = this.height + 1
+      // Assign the timestamp to the block
+      block.time = new Date().getTime().toString().slice(0, -3);
 
-        // Set the 'block.height' to the updated one
-        block.height = newBlockHeight
+      // Create the `block hash`
+      block.hash = SHA256(JSON.stringify(block));
 
-        // Assign the timestamp to the block
-        block.time = new Date().getTime().toString().slice(0, -3);
-
-        if (newBlockHeight > 0) {
-          const previousBlock = await this.getBlockByHeight(this.height);
-          block.previousBlockHash = previousBlock.hash;
-        }
-
-        // Create the `block hash`
-        block.hash = SHA256(JSON.stringify(block)).toString();
-
+      if (block.hash) {
         // Push the block into the chain array
-        this.chain.push(block);
-
-        // Update the `this.height` to the calculated height
-        this.height = newBlockHeight;
-
+        self.chain.push(block);
+        self.height++;
         resolve(block);
-      } catch (err) {
-        reject(err)
+      } else {
+        reject(new Error(`Add block failed!!`))
       }
     });
   }
@@ -108,7 +96,7 @@ class Blockchain {
     console.log(address)
     return new Promise((resolve) => {
       // <WALLET_ADDRESS>:${new Date().getTime().toString().slice(0,-3)}:starRegistry
-      const messageToBeSigned = `address:${new Date().getTime().toString().slice(0,-3)}:starRegistry`
+      const messageToBeSigned = `${address}:${new Date().getTime().toString().slice(0, -3)}:starRegistry`
       resolve(messageToBeSigned);
     });
   }
@@ -153,7 +141,7 @@ class Blockchain {
 
       // Verify the message with wallet address and signature:
       const bitcoinMessageValid = bitcoinMessage.verify(message, address, signature);
-      if(!bitcoinMessageValid) {
+      if (!bitcoinMessageValid) {
         reject(new Error('Validation Failure!! The message with wallet address and signature!'));
       }
 
@@ -184,9 +172,9 @@ class Blockchain {
     let self = this;
     return new Promise((resolve, reject) => {
       // Search on the chain array for the block that has the hash.
-      const searchedBlock = self.chain.find( blockToFind => hash === blockToFind.hash);
+      const searchedBlock = self.chain.find(blockToFind => hash === blockToFind.hash);
       console.log(`searchedBlock: ${searchedBlock}`)
-      if(!searchedBlock) {
+      if (!searchedBlock) {
         reject(new Error(`Could not find the block with hash: ${hash}!`));
       }
       resolve(searchedBlock);
@@ -220,16 +208,16 @@ class Blockchain {
     let self = this;
     let stars = [];
     return new Promise((resolve, reject) => {
-      self.chain.forEach( async (block) => {
+      self.chain.forEach(async (block) => {
         console.log(block)
         const blockData = await block.getBData();
         console.log(`blockData: ${blockData}`)
-        if(blockData.owner === address) {
+        if (blockData.owner === address) {
           stars.push(blockData)
         }
       })
 
-      if(!!stars.length) {
+      if (!!stars.length) {
         reject(`No stars existed in the chain for the owner! `)
       } else {
         resolve(stars);
@@ -247,11 +235,11 @@ class Blockchain {
     let self = this;
     let errorLog = [];
     return new Promise(async (resolve, reject) => {
-      self.chain.forEach( block => {
+      self.chain.forEach(block => {
         const isBlockValid = block.validate();
         console.log(`isBlockValid: ${isBlockValid}`);
 
-        if(!isBlockValid) {
+        if (!isBlockValid) {
           errorLog.push(new Error(`The previous block's hash does not match the current block with height ${block.height}`))
         }
       });
