@@ -105,8 +105,11 @@ class Blockchain {
    * @param {*} address
    */
   requestMessageOwnershipVerification(address) {
+    console.log(address)
     return new Promise((resolve) => {
-
+      // <WALLET_ADDRESS>:${new Date().getTime().toString().slice(0,-3)}:starRegistry
+      const messageToBeSigned = `address:${new Date().getTime().toString().slice(0,-3)}:starRegistry`
+      resolve(messageToBeSigned);
     });
   }
 
