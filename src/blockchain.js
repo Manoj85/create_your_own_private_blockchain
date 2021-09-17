@@ -99,7 +99,7 @@ class Blockchain {
   /**
    * The requestMessageOwnershipVerification(address) method
    * will allow you  to request a message that you will use to
-   * sign it with your Bitcoin Wallet (Electrum or Bitcoin Core)
+   * sign it with your Bitcoin Wallet (Ethereum or Bitcoin Core)
    * This is the first step before submit your Block.
    * The method return a Promise that will resolve with the message to be signed
    * @param {*} address
@@ -122,7 +122,7 @@ class Blockchain {
    * 1. Get the time from the message sent as a parameter example: `parseInt(message.split(':')[1])`
    * 2. Get the current time: `let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));`
    * 3. Check if the time elapsed is less than 5 minutes
-   * 4. Veify the message with wallet address and signature: `bitcoinMessage.verify(message, address, signature)`
+   * 4. Verify the message with wallet address and signature: `bitcoinMessage.verify(message, address, signature)`
    * 5. Create the block and add it to the chain
    * 6. Resolve with the block added.
    * @param {*} address
